@@ -6,6 +6,22 @@ import os
 def configure():
     load_dotenv()
 
+def generate_evaluation_prompt(user_inputs):
+    with open('prompt.txt', 'r') as file:
+        prompt_template = file.read()
+
+    workout_type = user_inputs[0]
+    workout_duration = user_inputs[1]
+    workout_intensity = user_inputs[2]
+
+    prompt = prompt_template.format(
+        workout_type=workout_type,
+        workout_duration=workout_duration,
+        workout_intensity=workout_intensity
+    )
+
+    return prompt
+
 def gemini_request(prompt):
     client = genai.Client(
         vertexai=True, project=os.getenv('project_id'), location=os.getenv('location')
@@ -22,7 +38,10 @@ def gemini_request(prompt):
 def main():
     configure()
 
-    prompt = "Give me a recipe to use after a workout involving one hour of weight training."
+    #prompt = "Give me a recipe to use after a workout involving one hour of weight training."
+    user_inputs = ["Boxing", "90 minutes", "High"]
+    prompt = generate_evaluation_prompt(user_inputs)
+    #print(prompt)
 
     output = gemini_request(prompt)
     print(output.text)
